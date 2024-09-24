@@ -1,0 +1,11 @@
+# Adding files which we don't want to push in production
+
+# adding .env  
+.env
+
+# adding nodemodule
+node_modules
+
+
+
+

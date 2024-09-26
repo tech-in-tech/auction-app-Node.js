@@ -47,6 +47,7 @@ app.use(morgan('dev'));
 // route
 // URL => http://localhost:4000
 app.use("/api/v1/auth",require('./routes/authroutes'))
+app.use("/api/v1/user",require('./routes/userRoutes'))
 
 app.get('/',(req,res)=>{
   return res.status(200).json("Welcon to auction server");

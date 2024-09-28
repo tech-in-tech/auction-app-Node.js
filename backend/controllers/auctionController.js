@@ -1,4 +1,5 @@
 const auctionModel = require("../models/auctionModel");
+const mongoose = require("mongoose")
 const userModel = require("../models/userModel");
 const cloudinary = require("cloudinary")
 // const bcrypt = require('bcryptjs');
@@ -87,4 +88,86 @@ const addNewAuctionItem = async (req, res) => {
   }
 }
 
-module.exports = { addNewAuctionItem }
+
+// Get All Auction
+const getAllAuctionItems = async(req,res)=>{
+  try {
+    let items = await auctionModel.find();
+    if(!items){
+      return res.status(400).send({
+        success: false,
+        message: "Items Not Found"
+      })
+    }
+    return res.status(200).send({
+      success: true,
+      message: "Get Items Successfully",
+      items
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message: "Error is get all auction items"
+    })
+  }
+}
+
+// Get single auction by ID
+const getSingleAuction = async(req,res)=>{
+  try {
+    const auctionId = req.params.id;
+    if(!mongoose.Types.ObjectId.isValid(auctionId)){
+      return res.status(400).send({
+        success: false,
+        message: "Invalid ID"
+      }) 
+    }
+    const auctionItem  = await auctionModel.findById(auctionId);
+    if(!auctionItem){
+      return res.status(404).send({
+        success: false,
+        message: "Auction Not Found"
+      }) 
+    }
+    const bidders  = auctionItem.bids.sort((a,b)=>b.bid-a.bid);
+    return res.status(200).send({
+      success: true,
+      message: "Auction get Successfully",
+      auctionItem,
+      bidders
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message: "Error in get single auction"
+    })
+  }
+}
+
+// Get My Auction
+const getMyAuctionItem = async(req,res)=>{
+  try {
+    const user = await userModel.findById({ _id: req.body.id })
+    const items = await auctionModel.find({createdBy:user.id});
+    if(!items){
+      return res.status(400).send({
+        success: false,
+        message: "No Auction Items found"
+      })
+    }
+    return res.status(500).send({
+      success: true,
+      message: "Auction Items Get successfully",
+      items
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message: "Error in get My auction API"
+    })
+  }
+}
+module.exports = { addNewAuctionItem,getAllAuctionItems,getSingleAuction,getMyAuctionItem}

@@ -127,6 +127,7 @@ const registerController = async (req, res) => {
       password: hashedPassword,
       email,
       phone,
+      role,
       address, profileImage: {
         public_id: cloudinaryResponse.public_id,
         url: cloudinaryResponse.secure_url,

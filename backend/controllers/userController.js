@@ -47,4 +47,24 @@ const deleteUserController = async (req,res) => {
   }
 }
 
-module.exports = { getUserController ,deleteUserController};
+// featch leader board
+const fetchLeaderboardController = async(req,res)=>{
+  try {
+    const users = await userModel.find({moneySpent:{$gt:0}});
+    const leaderBoard = users.sort((a,b)=>b.moneySpent-a.moneySpent);
+    res.status(200).send({
+      success: true,
+      message: "LeaderBoard get Successfully",
+      leaderBoard
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error in Fetch Leader API",
+      error
+    })
+  }
+}
+
+module.exports = { getUserController ,deleteUserController,fetchLeaderboardController};

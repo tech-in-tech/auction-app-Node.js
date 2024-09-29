@@ -170,4 +170,111 @@ const getMyAuctionItem = async(req,res)=>{
     })
   }
 }
-module.exports = { addNewAuctionItem,getAllAuctionItems,getSingleAuction,getMyAuctionItem}
+
+// Delete Auction
+const deleteAuctionController = async(req,res)=>{
+  try {
+    const auctionId = req.params.id;
+    if(!mongoose.Types.ObjectId.isValid(auctionId)){
+      return res.status(400).send({
+        success: false,
+        message: "Invalid ID"
+      }) 
+    }
+    const auctionItem = await auctionModel.findById(auctionId);
+    if(!auctionItem){
+      return res.status(404).send({
+        success: false,
+        message: "Auction Not Found"
+      })
+    }
+    await auctionItem.deleteOne();
+    return res.status(200).send({
+      success: true,
+      message: "Auction Item Deleted Successfully"
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message: "Error in Delete My auction API"
+    })
+  }
+}
+
+// Republish Item
+const republishItem = async(req,res)=>{
+  try {
+    const auctionId = req.params.id;
+    if(!mongoose.Types.ObjectId.isValid(auctionId)){
+      return res.status(400).send({
+        success: false,
+        message: "Invalid ID"
+      }) 
+    }
+    let auctionItem = await auctionModel.findById(auctionId);
+    if(!auctionItem){
+      return res.status(404).send({
+        success: false,
+        message: "Auction Not Found"
+      })
+    }
+    if(!req.body.startTime || req.body.endTime){
+      return res.status(400).send({
+        success: false,
+        message: "Start time and End time for repiblish is mendtery"
+      }); 
+    }
+    if(new Date(auctionItem.endTime)>Date.now()){
+      return res.status(400).send({
+        success: false,
+        message: "Auction is Already Active Cannot republish"
+      })
+    }
+    let data= {
+      startTime:new Date(req.body.startTime),
+      endTime:new Date(req.body.endTime)
+    }
+    if(data.startTime < Date.now()){
+      return res.status(400).send({
+        success: false,
+        message: "Auction Starting Time must be greater then Current time"
+      })
+    }
+
+    if(data.startTime >= data.endTime){
+      return res.status(400).send({
+        success: false,
+        message: "Auction Starting Time must be Less then Current time"
+      })
+    }
+
+    data.bids=[];
+    data.comm = false;
+    auctionItem = await auctionModel.findByIdAndUpdate(auctionId,data,{
+      new:true,
+      runValidators:true,
+      useFindAndModify:false,
+    });
+    const createdBy = await userModel.findByIdAndUpdate(user._id,{unpaidCommission:0},{
+      new:true,
+      runValidators:false,
+      useFindAndModify:false
+    }
+  )
+    return res.status(200).send({
+      success: false,
+      message: `Auction republish and will be active on ${req.body.startTime}`,
+      createdBy
+    });
+
+  }  catch (error) {
+    console.log(error)
+    return res.status(500).send({
+      success: false,
+      message: "Error in Republish Item API"
+    })
+  }
+}
+
+module.exports = { addNewAuctionItem,getAllAuctionItems,getSingleAuction,getMyAuctionItem,deleteAuctionController}

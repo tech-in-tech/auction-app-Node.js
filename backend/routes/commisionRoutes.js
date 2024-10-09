@@ -3,11 +3,11 @@ const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 const auctioneerMiddleware = require('../middleware/auctioneerMiddleware');
 const checkAuctionTimeMiddleware = require('../middleware/checkAuctionTimeMiddleware');
-const { placeBidController } = require('../controllers/bidController');
+const { proofOfCommission } = require('../controllers/commisionController');
 
 // routes
 // Get profile || GET
-router.post('/placeBid/:id',authMiddleware,checkAuctionTimeMiddleware,placeBidController);
+router.post('/proof/',authMiddleware,auctioneerMiddleware,proofOfCommission);
 
 
 module.exports = router

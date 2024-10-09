@@ -38,7 +38,7 @@ const placeBidController = async (req, res) => {
       auctionItem: auctionItem._id,
     });
     const existingBidInAuction = auctionItem.bids.find(
-      (bid) => bid.userId.toString() === req.user._id.toString()
+      (bid) => bid.userId.toString() === user.id.toString()
     );
 
     if (existingBid && existingBidInAuction) {
@@ -48,7 +48,7 @@ const placeBidController = async (req, res) => {
       await existingBid.save();
       auctionItem.currentBid = amount;
     } else {
-      const bidderDetail = await userModel.findById(req.user._id);
+      const bidderDetail = await userModel.findById(user.id);
       const newBid = await bid.create({
         amount,
         bidder: {

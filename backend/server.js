@@ -51,6 +51,7 @@ app.use("/api/v1/user",require('./routes/userRoutes'))
 app.use("/api/v1/auction",require('./routes/auctionroutes'))
 app.use("/api/v1/bid",require('./routes/bidRoutes'))
 app.use("/api/v1/commission",require('./routes/commisionRoutes'))
+app.use("/api/v1/supperAdmin",require('./routes/supperAdminRoutes'))
 
 app.get('/',(req,res)=>{
   return res.status(200).json("Welcon to auction server");
